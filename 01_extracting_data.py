@@ -67,39 +67,61 @@
 
 # COMMAND ----------
 
-tmpdir
-
-# COMMAND ----------
-
-dbutils.fs.mkdirs(f'tmp/{tmpdir}')
-
-# COMMAND ----------
-
-dbutils.fs.ls('dbfs:/dbfs/tmp/')
-
-# COMMAND ----------
-
-# MAGIC %sh -e
-# MAGIC cd /dbfs/tmp/yash.raj/
+# MAGIC %md
+# MAGIC **This part of the code didn't work, so I had to explicitly download the data**, 
+# MAGIC but for reference purposes i am adding the code
 
 # COMMAND ----------
 
 # DBTITLE 1,Downloading the data
 # MAGIC %sh -e
-# MAGIC cd /databricks/driver
-# MAGIC export KAGGLE_USERNAME=$kaggle_username
-# MAGIC export KAGGLE_KEY=$kaggle_key
-# MAGIC kaggle competitions download -p "$tmpdir" -c jigsaw-toxic-comment-classification-challenge
-
-# COMMAND ----------
-
-# MAGIC %sh -e
 # MAGIC rm -rf $tmpdir
 # MAGIC  
 # MAGIC cd $tmpdir
 # MAGIC  
-# MAGIC kaggle competitions download -p "$tmpdir" -c jigsaw-toxic-comment-classification-challenge
+# MAGIC kaggle competitions download -p "$tmpdir" -c jigsaw-toxic-comment-classification-challenge 
 
 # COMMAND ----------
 
+# DBTITLE 1,Unzipping the downloaded the data
+# MAGIC %sh -e
+# MAGIC cd $tmpdir
+# MAGIC unzip -o jigsaw-toxic-comment-classification-challenge.zip
+# MAGIC unzip -o train.csv.zip
+# MAGIC unzip -o test.csv.zip
 
+# COMMAND ----------
+
+# DBTITLE 1,Copying the downloaded data into the desired location
+# tmpdir = '/dbfs/tmp/yash.raj/' # directory to create
+# creating the directory explicityly
+dbutils.fs.mkdirs('yash.raj')
+
+# COMMAND ----------
+
+dbutils.fs.ls('dbfs:/tmp/yash.raj/')
+
+# COMMAND ----------
+
+# performing the copy of data
+ls = ['sample_submission', 'test_labels', 'train', 'test']
+for _ in ls:
+    dbutils.fs.cp("dbfs:/dbfs/tmp/yash.raj/{0}.csv".format(_), "dbfs:/tmp/yash.raj/")
+    print(f"{_} is copied")
+
+# COMMAND ----------
+
+# DBTITLE 1,Downloading Dota data
+# MAGIC %sh -e
+# MAGIC kaggle datasets download -p $tmpdir -d devinanzelmo/dota-2-matches
+
+# COMMAND ----------
+
+# DBTITLE 1,Unzipping the Dota Match Data
+# MAGIC %sh -e
+# MAGIC cd $tmpdir
+# MAGIC unzip -o dota-2-matches.zip 
+
+# COMMAND ----------
+
+display(dbutils.fs.ls('dbfs:/tmp/yash.raj/'))
