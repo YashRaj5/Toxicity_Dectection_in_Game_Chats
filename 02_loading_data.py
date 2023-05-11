@@ -30,13 +30,16 @@ spark.sql(f"USE {database_name}")
 
 # COMMAND ----------
 
+# import pandas as pd
+# df = spark.createDataFrame(pd.read_csv('/dbfs/tmp/yash.raj/train.csv'))
+
 # creating a dataframe for referencing 'train.csv' data
-trainDF = spark.read.csv('dbfs:/tmp/yash.raj/train.csv', header = True, multiLine=True)
+trainDF = spark.read.csv('dbfs:/tmp/yash.raj/train.csv', header = True, multiLine=True, escape='"')
 # creating table for train data
 trainDF.write.format("delta").mode("overwrite").saveAsTable("toxicity_training")
 
 # reading a datagrame for referencing 'test.csv' data
-testDF = spark.read.csv(f'dbfs:/tmp/yash.raj/test.csv', header=True, multiLine=True)
+testDF = spark.read.csv(f'dbfs:/tmp/yash.raj/test.csv', header=True, multiLine=True, escape='"')
 testDF.write.format("delta").mode("overwrite").saveAsTable("toxicity_test")
 
 # COMMAND ----------
